@@ -1,0 +1,56 @@
+<!--estoque/templates/estoque/estoque_list.html-->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lista de Entradas e Saídas de Estoque</h2>
+    <a href="{% url 'estoque:estoque_create' %}" class="btn btn-success mb-2">Adicionar Entrada/Saída</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Empresa</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Tipo</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estoque in estoques %}
+            <tr>
+                <td>{{ estoque.empresa.nome }}</td>
+                <td>{{ estoque.produto.nome_produto }}</td>
+                <td>{{ estoque.quantidade }}</td>
+                <td>{{ estoque.tipo }}</td>
+                <td>{{ estoque.data }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!--estoque/templates/estoque/estoque_form.html-->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if form.instance.pk %}Editar Entrada/Saída{% else %}Adicionar Entrada/Saída{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Atualizar{% else %}Salvar{% endif %}</button>
+        <a href="{% url 'estoque:estoque_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+
