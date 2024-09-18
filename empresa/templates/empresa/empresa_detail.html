@@ -1,0 +1,38 @@
+<!--empresa/templates/empresa/empresa_detail.html-->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalhes da Empresa</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ empresa.nome }}</h5>
+            <p class="card-text"><strong>Endereço:</strong> {{ empresa.endereco }}</p>
+            <p class="card-text"><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ empresa.email }}</p>
+            <p class="card-text"><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
+        </div>
+    </div>
+    <h3 class="mt-4">Notas Fiscais</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Série</th>
+                <th>Número</th>
+                <th>Descrição</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nota in notas %}
+            <tr>
+                <td>{{ nota.serie }}</td>
+                <td>{{ nota.numero }}</td>
+                <td>{{ nota.descricao }}</td>
+                <td>{{ nota.data }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
