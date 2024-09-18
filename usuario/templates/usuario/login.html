@@ -1,0 +1,98 @@
+<!--usuario/templates/usuario/login.html-->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Selecione o Usuário</h1>
+    <div class="row justify-content-center mt-4">
+        <div class="col-12">
+            <div class="card fixed-size-card mx-auto">
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for usuario in usuarios %}
+                        <div class="col-12 col-md-6 d-flex justify-content-center">
+                            <div class="card text-center btn-user-card">
+                                <div class="card-body d-flex flex-column justify-content-center">
+                                    <h5 class="card-title">{{ usuario.username }}</h5>
+                                    <!-- exibir o nome completo do usuário, utilize {{ usuario.get_full_name }} 
+                                     se os campos first_name e last_name estiverem preenchidos no modelo User:-->
+                                    <!-- <h5 class="card-title">{{ usuario.get_full_name }}</h5> -->
+                                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#loginModal" data-username="{{ usuario.username }}">
+                                        Selecionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'usuario:login' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="username">Usuário:</label>
+                        <input type="text" class="form-control" id="username" name="username" readonly>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="password">Senha:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Card maior com tamanho fixo */
+    .fixed-size-card {
+        width: 320px;
+        overflow-y: auto;
+    }
+
+    /* Ajuste dos cards menores */
+    .btn-user-card {
+        height: 150px;
+    }
+
+    .btn-user-card .card-body {
+        padding: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script para preencher o nome de usuário no modal
+    document.addEventListener('DOMContentLoaded', function() {
+        var loginModal = document.getElementById('loginModal');
+        loginModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var username = button.getAttribute('data-username');
+            var inputUsername = loginModal.querySelector('#username');
+            inputUsername.value = username;
+        });
+    });
+</script>
+
+{% endblock %}
+
