@@ -1,9 +1,15 @@
 ---- COMANDA DE COZINHA ----
 Mesa: 01  Pedido: 1
-Data: 17/09/2024
-Hora: 00:56:46
+Data: 18/09/2024
+Hora: 00:27:16
 -----------------------------
+Tapioca de carne - 1
+Descrição: Povilho e carne desfiada
 Suco de morango - 1
 Descrição: Morango e água
+Mini pizza baiana - 1
+Descrição: Massa e mussarela
+Whisky_Jack_Daniel´s - 1
+Descrição: Whisky_Jack_Daniel´s 1L
 -----------------------------
 Preparar com atenção!
