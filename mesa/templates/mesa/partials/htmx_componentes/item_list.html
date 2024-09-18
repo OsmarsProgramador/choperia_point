@@ -1,0 +1,52 @@
+<!-- mesa/templates/mesa/partials/htmx_componentes/item_list.html -->
+{% if itens_calculados %}
+    <!-- <table class="table table-bordered"> -->
+    <table>
+        <thead>
+            <tr>
+                <th>Item &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                <th>Qtd &nbsp; &nbsp; &nbsp; </th>
+                <th>Preço Unitário &nbsp; &nbsp;</th>
+                <th>Total &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens_calculados %}
+                <tr id="item-{{ item.codigo }}">
+                    <td>{{ item.nome_produto }} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
+                    <td>{{ item.quantidade }}</td>
+                    <td> {{ item.preco_unitario|floatformat:2 }}</td>
+                    <td>R$ {{ item.total_item|floatformat:2 }}</td>
+                    <td>
+                        <button type="button" 
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#excluirItemModal" 
+                            data-item-codigo="{{ item.codigo }}">
+                                Excluir
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Total a pagar: </strong><strong>R$ {{ total_geral|floatformat:2 }}</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+{% else %}
+    <p>Nenhum item adicionado.</p>
+{% endif %}
+
+
+
+
+
+
+
+
+

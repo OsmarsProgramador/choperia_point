@@ -1,0 +1,330 @@
+
+
+<!-- mesa\templates\mesa\abrir_mesa.html -->
+
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Exibir mensagens de erro ou alerta -->
+        {% if messages %}
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Card 1: Nome da Mesa e Usuário -->
+        <!-- Informações da mesa e do atendente -->
+        <div class="col-md-4" style="height: 100%;">
+            <div class="card" style="height: 550px;"> <!-- Definindo a altura fixa -->
+            
+                <div class="card-header">
+                    <div class="card-header" style="margin-right: 5px;">
+                        <span style="color: green; font-weight: bold;">Mesa: {{ mesa.nome }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <!-- <div class="card-body" style="display: flex; align-items: center; height: 5vh;"> -->
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush" style="display: flex; align-items: center; list-style: none; padding: 0; margin: 0;">
+                                <li class="list-group-item" style="color: white; font-weight: bold; margin-right: 5px;">Pedido: {{ mesa.pedido }}</li>
+                            </ul>
+                            <ul class="list-group list-group-flush" style="display: flex; align-items: center; list-style: none; padding: 0; margin: 0;">
+                                <li class="list-group-item" style="background-color: green; color: white; font-weight: bold;">Em aberto</li>
+                            </ul>
+                        </div>
+                    </h5>
+                    <p class="card-text">
+                        <div class="col-md">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" style="color: whitesmoke;">
+                                    Data: {{ now|date:"d/m/Y" }}
+                                </li>
+                                <li class="list-group-item" style="color: whitesmoke;">
+                                    Hora: <span id="hora">{{ now|date:"H:i:s" }}</span>
+                                </li>
+                                <li class="list-group-item" style="color: whitesmoke;">
+                                    Atendente: {{ usuario_atual_nome }}
+                                </li>
+                            </ul>
+                            <hr>
+                            <!-- Botão para redirecionar para a página de pagamento Método Get acionado-->
+                            <a href="{% url 'mesa:realizar_pagamento' mesa.id %}" class="btn btn-success mt-3 mx-2">
+                                Realizar Pagamento
+                            </a>
+                            <!-- Botão para trocar usuário -->
+                            <button type="button" onclick="openPasswordModal()" class="btn btn-primary mt-3 mx-2">
+                                Trocar usuário
+                            </button> 
+                        </div>
+                    </p>
+                </div>
+            </div> 
+        </div>
+
+
+        <!-- TODO: Implementar o botão para excluir/cancela o pedido -->
+
+        <!-- Card 2: Itens da Mesa -->
+        <!-- Informações da Comanda de pedido -->
+        <div class="col-md-8">
+            <div class="card" style="height: 550px;"> <!-- Definindo a altura fixa -->
+                <div class="card-body">
+                    
+                    <!-- Botão para abrir o modal de adicionar produto -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title">Comanda de Pedido: {{ mesa.pedido }}</h5>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adicionarProdutoModal">
+                            Adicionar Produto
+                        </button>
+                    </div>
+                    <!-- Já passando o usuario autenticado para item_list -->
+                    <div id="item-list-container">
+                        {% include 'mesa/partials/htmx_componentes/item_list.html' %}
+                    </div>
+                    <!-- Botões de Ação -->
+                    <a href="{% url 'mesa:gerar_comanda_pdf' mesa.id %}" class="btn btn-secondary mt-3">Imprimir Comanda</a>
+                    <form action="{% url 'mesa:cancelar_pedido' mesa.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger mt-3">Cancelar Pedido</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para adicionar produto -->
+<div class="modal fade" id="adicionarProdutoModal" tabindex="-1" aria-labelledby="adicionarProdutoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="adicionarProdutoModalLabel">Adicionar Produto à Mesa: {{ mesa.nome }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="table-tab" data-bs-toggle="tab" data-bs-target="#table" type="button" role="tab" aria-controls="table" aria-selected="true">Tabela</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="grid-tab" data-bs-toggle="tab" data-bs-target="#grid" type="button" role="tab" aria-controls="grid" aria-selected="false">Grade</button>
+                    </li>
+                </ul>
+                <!-- Tab content -->
+                 
+                <div class="tab-content mt-3">
+                    <!-- Tabela -->
+                    <div class="tab-pane fade show active" id="table" role="tabpanel" aria-labelledby="table-tab">
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Preço</th>
+                                    <th>Quantidade</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for produto in produtos %}
+                                <tr>
+                                    <td>{{ produto.nome_produto }}</td>
+                                    <td>{{ produto.categoria.nome }}</td>
+                                    <td>R${{ produto.venda|floatformat:2 }}</td>
+
+                                    <!-- Sem HTMX
+                                    <td>
+                                        <form id="form-{{ produto.id }}" action="{% url 'mesa:adicionar_item' mesa.id produto.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="number" name="quantidade" value="1" min="1" class="form-control mb-2" style="width: 60px;">
+                                    </td>
+                                    <td>
+                                            <button type="submit" class="btn btn-success">Adicionar</button>
+                                        </form>
+                                    </td>
+                                    -->
+                                    <!-- Com HTMX -->
+
+                                    <td>
+                                        <input type="number" name="quantidade" form="form-{{ produto.id }}" value="1" min="1" class="form-control mb-2" style="width: 60px;">
+                                    </td>
+                                    <td>
+                                        <form id="form-{{ produto.id }}" 
+                                              hx-post="{% url 'mesa:adicionar_item' mesa.id produto.id %}"
+                                              hx-target="#item-list-container"
+                                              hx-swap="innerHTML">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success">Adicionar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Grade -->
+                    <div class="tab-pane fade" id="grid" role="tabpanel" aria-labelledby="grid-tab">
+                        <div class="row">
+                            {% for produto in produtos %}
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <img src="{{ produto.imagem.url }}" class="card-img-top" alt="{{ produto.nome_produto }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ produto.nome_produto }}</h5>
+                                        <p class="card-text">{{ produto.categoria.nome }}</p>
+                                        <p class="card-text">R${{ produto.venda|floatformat:2 }}</p>
+
+                                        <!-- Sem HTMX
+                                        <form id="form-{{ produto.id }}-grid" action="{% url 'mesa:adicionar_item' mesa.id produto.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="number" name="quantidade" value="1" min="1" class="form-control mb-2" style="width: 60px;">
+                                            <button type="submit" class="btn btn-success">Adicionar</button>
+                                        </form>
+                                        -->
+                                        <!-- Com HTMX -->
+
+                                        
+                                        <form id="form-{{ produto.id }}-grid" 
+                                              hx-post="{% url 'mesa:adicionar_item' mesa.id produto.id %}"
+                                              hx-target="#item-list-container"
+                                              hx-swap="innerHTML">
+                                            {% csrf_token %}
+                                            <div class="d-flex align-items-center">
+                                                <input type="number" name="quantidade" form="form-{{ produto.id }}-grid" value="1" min="1" class="form-control mb-2" style="width: 60px;">
+                                                <button type="submit" class="btn btn-success">Adicionar</button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal para inserção da senha e troca de usuário -->
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordModalLabel">Trocar Usuário</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="passwordForm" method="post" action="{% url 'mesa:update_user' mesa.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="usuario">Selecione o Usuário:</label>
+                        <select id="usuario" name="usuario" class="form-control">
+                            {% for user in usuarios %}
+                                <option value="{{ user.id }}">{{ user.username }}</option> <!-- user.user.username pertence ao modelo Usuario e user.username ao User -->
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="password">Senha</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação para excluir item -->
+<div class="modal fade" id="excluirItemModal" tabindex="-1" aria-labelledby="excluirItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'mesa:excluir_item' mesa.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="excluirItemModalLabel">Excluir Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Você tem certeza que deseja excluir este item?</p>
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade:</label>
+                        <input type="number" name="quantidade" id="quantidade" class="form-control" value="1" min="1">
+                    </div>
+                    <input type="hidden" name="item_codigo" id="itemCodigo">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function atualizarHora() {
+            const agora = new Date();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            const segundos = String(agora.getSeconds()).padStart(2, '0');
+            const horaAtual = `${horas}:${minutos}:${segundos}`;
+            document.getElementById('hora').innerText = horaAtual;
+        }
+
+        // Atualiza a hora imediatamente ao carregar a página
+        atualizarHora();
+        
+        // Atualiza a hora a cada segundo
+        setInterval(atualizarHora, 1000);
+
+        // Captura o código do item a ser excluído
+        document.addEventListener('DOMContentLoaded', function() {
+            var excluirItemModal = document.getElementById('excluirItemModal');
+            excluirItemModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var itemCodigo = button.getAttribute('data-item-codigo');
+                var inputItemCodigo = excluirItemModal.querySelector('#itemCodigo');
+                inputItemCodigo.value = itemCodigo;
+            });
+        });
+
+        // Abre modal para trocar usuário
+        function openPasswordModal() {
+            $('#passwordModal').modal('show');
+        }
+
+        // Recarrega a página quando o modal de adicionar produto é fechado
+        $('#adicionarProdutoModal').on('hidden.bs.modal', function () {
+            location.reload();
+        });
+    </script>
+    
+{% endblock %}
+
+
+

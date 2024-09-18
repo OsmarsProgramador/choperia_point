@@ -1,0 +1,118 @@
+
+<!-- mesa/templates/mesa/list_mesa.html -->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Botão para abrir o modal de cadastro de nova mesa numerada -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#novaMesaModal">
+        Cadastrar Nova Mesa
+    </button>
+
+    <!-- Botão para abrir o modal de cadastro de mesa com nome de pessoa -->
+    <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#novaMesaPessoaModal">
+        Pedido no balcão
+    </button>
+
+    <!-- Modal para criar uma nova mesa numerada via cards -->
+    <div class="modal fade" id="novaMesaModal" tabindex="-1" aria-labelledby="novaMesaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="novaMesaModalLabel">Nova Mesa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Mesas Disponíveis</h3>
+                    <div class="row">
+                        {% for mesa_disponivel in mesas_disponiveis %}
+                            <div class="col-4 col-md-3 mb-3">
+                                <div class="card text-bg-success mb-3" style="max-width: 18rem;">
+                                    <div class="card-header text-center">
+                                        Mesa {{ mesa_disponivel }}
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <form method="post" action="{% url 'mesa:nova_mesa' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="nome" value="{{ mesa_disponivel }}">
+                                            <button type="submit" class="btn btn-primary">Escolher</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para criar uma nova mesa com nome de pessoa -->
+    <div class="modal fade" id="novaMesaPessoaModal" tabindex="-1" aria-labelledby="novaMesaPessoaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="novaMesaPessoaModalLabel">Cadastrar Mesa com Nome de Pessoa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'mesa:nova_mesa' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="nomeMesaPessoa" class="form-label">Nome da Mesa (Pessoa)</label>
+                            <input type="text" class="form-control" id="nomeMesaPessoa" name="nome" placeholder="Digite o nome da pessoa" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cadastrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aqui será exibida a lista de mesas abertas e fechadas -->
+    <div id="lista-de-mesas">
+        {% if mesas_abertas %}
+            <h2 style="color:green;">Pedido(s) em andamento</h2>
+            <div class="row">
+                {% for mesa in mesas_abertas %}
+                    <div class="col-12 col-md-2">
+                        <div class="card text-bg-primary mb-3" style="max-width: 18rem;">
+                            <div class="card-header text-center">
+                                <a href="{% url 'mesa:abrir_mesa' mesa.id %}" class="abrir-mesa-link" style="color: white;">Ver pedido</a>
+                            </div>
+                            <div class="card-body">
+                              <h5 class="card-title text-center">{{ mesa.nome }}</h5>
+                              <p class="card-text text-center">Pedido: {{ mesa.pedido }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% if mesas_fechadas %}
+            <h2>Mesas Fechadas</h2>
+            <div class="row">
+                {% for mesa in mesas_fechadas %}
+                    <div class="col-12 col-md-2">
+                        <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+                            <div class="card-header text-center">
+                                <a href="{% url 'mesa:abrir_mesa' mesa.id %}" class="abrir-mesa-link" style="color: white;">Abrir</a>
+                            </div>
+                            <div class="card-body">
+                              <h5 class="card-title text-center">{{ mesa.nome }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+

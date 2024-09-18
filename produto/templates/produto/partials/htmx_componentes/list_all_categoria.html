@@ -1,0 +1,65 @@
+<!-- Responsável por atualizar os valores da tabela de categoria
+ após uma nova categoria ser add -->
+<!-- produto/partials/htmx_componentes/list_all_categoria.html -->
+{% if categorias %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col" class="text-end">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for categoria in categorias %}
+                <tr>
+                    <td>{{ categoria.nome }}</td>
+                    <td class="text-end">                        
+                        <button class="btn btn-warning" style="cursor: pointer;"
+                            data-bs-toggle="modal" data-bs-target="#editCategoriaModal"
+                            hx-get="{% url 'produto:edit_categoria' categoria.id %}" 
+                            hx-target="#editCategoriaForm">Editar</button>
+
+                        <button class="btn btn-danger btn-sm" style="cursor: pointer;"
+                            hx-delete="{% url 'produto:delete_categoria' categoria.id %}"
+                            hx-trigger="click"
+                            hx-target="#list-categoria">Excluir</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Controles de Paginação -->
+    <div class="col-md-6">
+        <div class="pagination">
+            {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; primeira</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">próxima</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <h4>Nenhuma categoria cadastrada.</h4>
+{% endif %}
+
+
+

@@ -1,0 +1,251 @@
+<!-- produto/templates/produto/list_produto.html -->
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+    <div class="container mt-4">
+        <div class="row align-items-center justify-content-between"> <!-- Justify-content-between coloca os elementos nas extremidades -->
+            <!-- 
+            <div class="col-md-auto"> --> <!-- Botão ocupará o espaço necessário apenas -->
+                <!-- 
+                class="btn btn-primary my-2": Define a aparência do botão utilizando classes do Bootstrap.
+                data-bs-toggle="modal": Indica que ao clicar no botão, ele deve acionar um modal.
+                data-bs-target="#produtoModal": Especifica o ID do modal que deve ser aberto (#produtoModal) -->
+                <!-- 
+                <button class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#produtoModal">
+                    Cadastrar Produto
+                </button>
+            </div>
+            <div class="col-md-6 text-end"> --> <!-- Barra de pesquisa ocupando 6 colunas e alinhada à direita -->
+                <!-- 
+                <input type="text"  
+                    hx-post="{% url 'produto:search-produto' %}"
+                    hx-target="#list-produto"
+                    hx-trigger="input changed delay:500ms, search"
+                    name="search"
+                    class="form-control"
+                    placeholder="Pesquisar produtos..."/>
+            </div> -->
+        </div>
+        <!-- Div que exibe os produtos cadastrados -->
+        <div id="list-produto">
+            {% include 'produto/partials/htmx_componentes/list_all_produtos.html' %}
+        </div>
+    </div>
+
+    <!-- Modal para Cadastrar vários produtos até que o usuário feche o modal -->
+    <div class="modal fade" id="produtoModal" tabindex="-1" aria-labelledby="produtoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="produtoModalLabel">Cadastrar Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form hx-post="{% url 'produto:create_produto' %}" 
+                        hx-trigger="submit" 
+                        hx-target="#list-produto" 
+                        hx-swap="innerHTML" 
+                        hx-on="htmx:afterRequest:limparCampos"
+                    >
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Nome do produto</span>
+                            <input type="text" id="nome-produto" name="nome_produto" class="form-control" 
+                                hx-get="{% url 'produto:check_produto' %}" 
+                                hx-trigger="keyup" 
+                                hx-target="#produto-out">
+                        </div>
+                        <div id="produto-out"></div>
+                        
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="categoria-produto">Categoria</label>
+                            <select id="categoria-produto" name="categoria" class="form-select">
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Descrição</span>
+                            <textarea id="descricao-produto" name="descricao" class="form-control"></textarea>
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Custo</span>
+                            <input type="number" id="custo-produto" name="custo" class="form-control">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Preço de Venda</span>
+                            <input type="number" id="venda-produto" name="venda" class="form-control">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Código</span>
+                            <input type="text" id="codigo-produto" name="codigo" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Estoque</span>
+                            <input type="number" id="estoque-produto" name="estoque" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Estoque Total</span>
+                            <input type="number" id="estoque-total-produto" name="estoque_total" class="form-control">
+                        </div>
+
+                        <label for="imagem-produto">Imagem</label>
+                        <input type="file" id="imagem-produto" name="imagem" class="form-control">
+                        <br>
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Produto -->
+    <div class="modal fade" id="editProdutoModal" tabindex="-1" aria-labelledby="editProdutoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProdutoModalLabel">Editar Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!--O formulário editProdutoForm dentro do modal editProdutoModal 
+                    tem como objetivo permitir a edição de um produto existente. Ou seja, traz todos os dados para serem editados-->
+                    <form id="editProdutoForm" hx-post="{% url 'produto:update_produto' %}" 
+                        hx-trigger="submit" 
+                        hx-target="#list-produto" 
+                        hx-swap="innerHTML"
+                    >
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Nome do produto</span>
+                            <input type="text" id="nome-produto" name="nome_produto" class="form-control" value="{{ form.instance.nome_produto }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="categoria-produto">Categoria</label>
+                            <select id="categoria-produto" name="categoria" class="form-select">
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}" {% if form.instance.categoria == categoria %}selected{% endif %}>{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Descrição</span>
+                            <textarea id="descricao-produto" name="descricao" class="form-control">{{ form.instance.descricao }}</textarea>
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Custo</span>
+                            <input type="number" id="custo-produto" name="custo" class="form-control" step="0.01" value="{{ form.instance.custo }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Preço de Venda</span>
+                            <input type="number" id="venda-produto" name="venda" class="form-control" step="0.01" value="{{ form.instance.venda }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Código</span>
+                            <input type="text" id="codigo-produto" name="codigo" class="form-control" value="{{ form.instance.codigo }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Estoque</span>
+                            <input type="number" id="estoque-produto" name="estoque" class="form-control" value="{{ form.instance.estoque }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Estoque Total</span>
+                            <input type="number" id="estoque-total-produto" name="estoque_total" class="form-control" value="{{ form.instance.estoque_total }}">
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="imagem-produto">Imagem</label>
+                            <input type="file" id="imagem-produto" name="imagem" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <!-- Campos do formulário serão preenchidos dinamicamente -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+<!-- Adicionamos um evento htmx:afterRequest no script para limpar os campos após a submissão do formulário.
+Usamos HTMX para capturar o evento após a requisição e limpar os campos "Nome do produto" e "Preço do produto". -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    //script JavaScript limpa os campos após a submissão do formulário
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.target.id === 'list-produto') {
+            document.getElementById('nome-produto').value = '';
+            document.getElementById('categoria-produto').value = '';
+            document.getElementById('descricao-produto').value = '';
+            document.getElementById('custo-produto').value = '';
+            document.getElementById('venda-produto').value = '';
+            document.getElementById('codigo-produto').value = '';
+            document.getElementById('estoque-produto').value = '';
+            document.getElementById('estoque-total-produto').value = '';
+            document.getElementById('imagem-produto').value = '';
+        }
+    });
+</script>
+{% block scripts %}
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.1.3/datatables.min.js"></script>
+    
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.1.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.1.1/js/buttons.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#tabela-listar').DataTable({
+            responsive: true,
+            paging: true,
+            aaSorting: [],
+            pageLength: 10,
+            language: {
+                lengthMenu: "Mostrar _MENU_ registros",
+                search: "Procurar:",
+                info: "Mostrando _START_ até _END_ de _TOTAL_ registros",
+                infoFiltered: "(filtrados de um total de _MAX_ registros)",
+                paginate: {
+                    first: "Primeiro",
+                    last: "Último",
+                    next: "Seguinte",
+                    previous: "Anterior"
+                },
+                emptyTable: "Sem dados disponíveis",
+                zeroRecords: "Nenhum resultado encontrado"
+            },
+            // Configuração para alinhamento correto
+            dom: '<"row align-items-center"<"col-md-4"l><"col-md-4 text-center"B><"col-md-4"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row align-items-center"<"col-md-6"i><"col-md-6 d-flex justify-content-end"p>>',
+            buttons: [
+                {
+                    text: 'Cadastrar Produto',
+                    className: 'btn btn-primary',
+                    action: function (e, dt, node, config) {
+                        $('#produtoModal').modal('show');
+                    }
+                }
+            ]
+        });
+    });
+
+</script>
+
+
+{% endblock %}
+

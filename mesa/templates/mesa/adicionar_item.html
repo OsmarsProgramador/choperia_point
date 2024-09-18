@@ -1,0 +1,47 @@
+<!-- mesa/templates/mesa/adicionar_item.html -->
+
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Adicionar Produto à Mesa: {{ mesa.nome }}</h2>
+    
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+            <tr>
+                <td>{{ produto.nome_produto }}</td>
+                <td>{{ produto.categoria.nome }}</td>
+                <td>R${{ produto.venda|floatformat:2 }}</td>
+                <td>
+                    <form method="post" action="{% url 'mesa:adicionar_item' mesa.id produto.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="quantidade" value="1" min="1" class="form-control mb-2" style="width: 60px;">
+                        <button type="submit" class="btn btn-success">Adicionar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'mesa:abrir_mesa' mesa.id %}" class="btn btn-secondary mt-3">Voltar à Mesa</a>
+</div>
+{% endblock %}
+
+

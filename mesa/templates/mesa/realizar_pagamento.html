@@ -1,0 +1,240 @@
+<!-- mesa/templates/mesa/pagamento.html -->
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <h1>Pagamento da Mesa {{ mesa.nome }}</h1>
+        
+        <!-- Informações da Comanda de pedido 1 -->
+        <div class="col-md-6">
+            <div class="card" style="height: 500px;">
+                <div class="card-body">
+                    <div id="item-list-container">
+                        {% if itens_calculados %}
+                            <table>
+                                <tbody>
+                                    {% for item in itens_calculados %}
+                                        <tr id="item-{{ item.codigo }}">
+                                            <td>{{ item.quantidade }}</td>
+                                            <td>{{ item.nome_produto }}&nbsp;</td> <!-- &nbsp; significa espaço -->
+                                            <td>( {{ item.preco_unitario }} )&nbsp;</td>
+                                            <td> ------------------------- R$ {{ item.total_item|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end"><strong>Total a pagar: </strong><strong>R$ {{ total_geral|floatformat:2 }}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <!-- Dividir a conta -->
+                            <div class="mt-4">
+                                <label for="numero-pessoas" class="form-label"><strong>Dividir a conta por:</strong></label>
+                                <input type="number" id="numero-pessoas" class="form-control" value="1" min="1" oninput="calcularDivisao()" style="width: 100px;">
+                            </div>
+                            <!-- Exibir valor por pessoa -->
+                            <div class="mt-3">
+                                <p><strong>Total por pessoa:</strong> R$ <span id="total-por-pessoa">{{ total_geral|floatformat:2 }}</span></p>
+                            </div>
+                            <!-- Botão imprimir -->
+                            <a href="{% url 'mesa:gerar_comanda_pdf' mesa.id %}" target="_blank" class="btn btn-secondary mt-3 mx-2">
+                                Imprimir Comanda
+                            </a>
+                        {% else %}
+                            <p>Nenhum item adicionado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Escolha uma forma de Pagamento -->
+        <div class="col-md-6">
+            <div class="card" style="height: 500px;">
+                <div class="card-body">
+                    <h1>Escolha uma forma de Pagamento</h1>
+                    <div class="row">
+                        <!-- Opções de pagamento -->
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('dinheiro')">
+                                <div class="card-body">
+                                    <h5 class="card-title">Dinheiro</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('debito')">
+                                <div class="card-body">
+                                    <h5 class="card-title">Débito</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('credito')">
+                                <div class="card-body">
+                                    <h5 class="card-title">Crédito</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('vale_alimentacao')">
+                                <div class="card-body">
+                                    <h5 class="card-title">V. Alimentação</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('vale_refeicao')">
+                                <div class="card-body">
+                                    <h5 class="card-title">V. Refeição</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center mb-3" style="cursor: pointer;" onclick="escolherFormaPagamento('pix')">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pix</h5>
+                                    <button class="btn btn-success">Selecionar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Flex-grow para ocupar o espaço restante -->
+                    <div class="flex-grow-1"></div>
+                    <!-- exibir o "Total Pago" e o "Valor Faltante" -->
+                    <div class="mt-3">
+                        <table class="table">                            
+                            <tbody>
+                                <tr>
+                                    <td><p><strong>Total Pago:</strong> R$ <span id="total-pago">{{ mesa.valor_pago|floatformat:2 }}</span></p></td>
+                                    <td><p><strong>Valor Faltante:</strong> R$ <span id="valor-faltante">{{ faltante|floatformat:2 }}</span></p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> 
+                </div>
+            </div>
+        </div>       
+    </div>
+</div>
+
+<!-- Modal para entrada do valor a ser pago -->
+<div class="modal fade" id="pagamentoModal" tabindex="-1" aria-labelledby="pagamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'mesa:pagamento_pessoa' mesa.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pagamentoModalLabel">Executar Pagamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="forma_pagamento" id="formaPagamentoInput">
+                    <div class="form-group mb-3">
+                        <label for="valorPago">Valor a ser pago:</label>
+                        <!-- 
+                        Atributo step="0.01": Permite que o campo aceite valores decimais com até duas casas decimais. 
+                         Se precisar permitir mais ou menos casas decimais, você pode ajustar o valor de step (por exemplo, 
+                         step="0.1" para uma casa decimal ou step="0.001" para três casas decimais). -->
+                         <input type="number" class="form-control" name="valor_pago" id="valorPago" value="{{ total_por_pessoa }}" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorFaltante">Valor faltante:</label>
+                            <span id="valorFaltante">R$ {{ faltante|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let formaPagamentoSelecionada = '';
+    function calcularDivisao() {
+        // Corrigindo a interpolação da variável total_geral para o contexto JavaScript
+        var totalGeral = parseFloat("{{ total_geral|floatformat:2 }}");
+
+        // Obtém o número de pessoas do input e converte para número
+        var numeroPessoas = parseInt(document.getElementById('numero-pessoas').value, 10);
+
+        // Evitar divisão por zero ou valores negativos
+        if (numeroPessoas < 1 || isNaN(numeroPessoas)) {
+            numeroPessoas = 1;
+        }
+
+        // Calcula o total por pessoa
+        var totalPorPessoa = (totalGeral / numeroPessoas);
+
+        // Formata o valor para o padrão brasileiro, mas sem o símbolo da moeda
+        var totalPorPessoaFormatado = totalPorPessoa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Atualiza o valor exibido
+        document.getElementById('total-por-pessoa').innerText = totalPorPessoaFormatado;
+    }
+    
+    function escolherFormaPagamento(formaPagamento) {
+        // Definir a forma de pagamento selecionada
+        document.getElementById('formaPagamentoInput').value = formaPagamento;
+        
+        // Abrir o modal
+        var modal = new bootstrap.Modal(document.getElementById('pagamentoModal'));
+        modal.show();
+    }
+    /*
+    function confirmarPagamento() {
+        const numeroPessoas = document.getElementById('numero-pessoas').value;
+        window.location.href = `{% url 'mesa:pagamento_pessoa' mesa.id %}?forma=${formaPagamentoSelecionada}&pessoas=${numeroPessoas}`;
+    }*/
+    document.querySelector('#pagamentoModal form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar o envio padrão do formulário
+        var form = event.target;
+        var url = form.action;
+        var formData = new FormData(form);
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('pagamentoModal'));
+            modal.hide();
+
+            if (data.status === 'concluido') {
+                window.location.href = `{% url 'mesa:confirmacao_pagamento' id_mesa=mesa.id %}`;
+            } else {
+                document.getElementById('total-pago').innerText = data.valor_pago.toFixed(2);
+                document.getElementById('valor-faltante').innerText = data.faltante.toFixed(2);
+            }
+        })
+        .catch(error => console.error('Erro:', error));
+    });
+</script>
+
+
+{% endblock %}
+
+

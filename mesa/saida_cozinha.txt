@@ -1,0 +1,9 @@
+---- COMANDA DE COZINHA ----
+Mesa: 01  Pedido: 1
+Data: 17/09/2024
+Hora: 00:56:46
+-----------------------------
+Suco de morango - 1
+Descrição: Morango e água
+-----------------------------
+Preparar com atenção!

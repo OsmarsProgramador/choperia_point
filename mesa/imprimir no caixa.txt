@@ -1,0 +1,319 @@
+Sim, você pode definir uma empresa padrão no settings.py e utilizá-la para configurar uma lógica no seu sistema que, ao gerar uma comanda, busque os dados dessa empresa. Aqui estão algumas abordagens para implementar isso:
+
+1. Definir a Empresa Padrão no settings.py
+No arquivo settings.py, você pode definir uma variável para armazenar o ID ou o CNPJ da empresa padrão.
+
+python
+Copiar código
+# settings.py
+
+# Define o ID da empresa padrão
+DEFAULT_EMPRESA_ID = 1  # Por exemplo, o ID da empresa padrão no banco de dados
+
+# Ou defina pelo CNPJ
+DEFAULT_EMPRESA_CNPJ = "00.000.000/0001-00"
+2. Utilizar a Empresa Padrão nas Views
+Você pode usar a empresa padrão ao buscar os dados para gerar a comanda ou em qualquer outra parte do código onde precisar da empresa.
+
+Exemplo 1: Usando ID
+python
+Copiar código
+# mesa/views.py
+from django.conf import settings
+from empresa.models import Empresa
+
+def get_empresa_padrao():
+    return Empresa.objects.get(id=settings.DEFAULT_EMPRESA_ID)
+Exemplo 2: Usando CNPJ
+python
+Copiar código
+# mesa/views.py
+from django.conf import settings
+from empresa.models import Empresa
+
+def get_empresa_padrao():
+    return Empresa.objects.get(cnpj=settings.DEFAULT_EMPRESA_CNPJ)
+3. Implementar na View da Comanda
+Ao gerar uma comanda, você pode buscar essa empresa padrão e utilizar os dados dela.
+
+python
+Copiar código
+from django.conf import settings
+from empresa.models import Empresa
+from .models import Mesa
+from django.views import View
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from datetime import datetime
+
+class GerarComandaPDFView(View):
+    def get(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, pk=mesa_id)
+        empresa = get_empresa_padrao()
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="comanda_{mesa_id}.pdf"'
+
+        p = canvas.Canvas(response, pagesize=letter)
+        largura, altura = letter
+
+        # Cabeçalho
+        p.drawString(100, altura - 40, empresa.nome)
+        p.drawString(100, altura - 60, empresa.endereco)
+        p.drawString(100, altura - 80, f"CNPJ: {empresa.cnpj}")
+        p.drawString(100, altura - 100, f"Telefone: {empresa.telefone}")
+        
+        p.drawString(100, altura - 120, f"Data: {datetime.now().strftime('%d/%m/%Y')}")
+        p.drawString(400, altura - 120, f"Hora: {datetime.now().strftime('%H:%M:%S')}")
+
+        # Conteúdo da comanda
+        y = altura - 160
+        p.drawString(100, y, "Item        Qtde  Valor Unit.  Valor Total")
+        y -= 20
+        p.drawString(100, y, "-" * 50)
+
+        for item in mesa.itens:
+            y -= 20
+            p.drawString(100, y, f"{item['nome_produto']:10} {item['quantidade']:4}  R$ {item['preco_unitario']:6.2f}  R$ {item['quantidade'] * item['preco_unitario']:7.2f}")
+        
+        # Rodapé
+        y -= 40
+        total = sum(item['quantidade'] * item['preco_unitario'] for item in mesa.itens)
+        p.drawString(100, y, f"Total: R$ {total:.2f}")
+
+        p.showPage()
+        p.save()
+        return response
+4. Alternativa: Utilizar um Context Processor
+Outra abordagem é criar um context processor que injete a empresa padrão no contexto de todas as views automaticamente.
+
+Exemplo de Context Processor
+python
+Copiar código
+# empresa/context_processors.py
+from .models import Empresa
+from django.conf import settings
+
+def empresa_padrao(request):
+    try:
+        empresa = Empresa.objects.get(id=settings.DEFAULT_EMPRESA_ID)
+    except Empresa.DoesNotExist:
+        empresa = None
+    return {'empresa_padrao': empresa}
+Adicionar ao settings.py
+python
+Copiar código
+# settings.py
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'empresa.context_processors.empresa_padrao',  # Adicionar aqui
+            ],
+        },
+    },
+]
+Considerações Finais
+Empresa Padrão: Garantir que a empresa padrão esteja sempre definida evita erros.
+Personalização: Esse método pode ser estendido para permitir que usuários selecionem a empresa, se necessário.
+Escalabilidade: A empresa padrão deve ser fácil de alterar conforme necessário, especialmente em um ambiente de produção.
+Assim, você pode conectar os dados da empresa padrão aos seus produtos e mesas, garantindo que as informações corretas sejam usadas ao gerar comandas e outros documentos.
+
+Você disse:
+Tá bacana. Só que os nomes dos itens estão incompletos, ou seja, depois do primeiro nome o restante do nome é um nome cortado: class GerarComandaPDFView(View):
+    def get(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, pk=mesa_id)
+        empresa = get_empresa_padrao()
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="comanda_{mesa_id}.pdf"'
+
+        p = canvas.Canvas(response)
+
+        largura = 80 * mm
+        altura = 297 * mm  # Tamanho A4 para o exemplo, ajustar conforme a necessidade
+
+        # Fonte monoespaçada
+        p.setFont("Courier", 10)
+
+        # Cabeçalho
+        p.drawString(5, altura - 20, "------------------------------")
+        p.drawString(5, altura - 30, empresa.nome)
+        p.drawString(5, altura - 40, empresa.endereco)
+        p.drawString(5, altura - 50, f"CNPJ: {empresa.cnpj}")
+        p.drawString(5, altura - 60, f"Telefone: {empresa.telefone}")
+        p.drawString(5, altura - 70, "------------------------------")
+        # Data e Hora
+        p.drawString(5, altura - 80, f"")
+        p.drawString(5, altura - 90, f"Data: {datetime.now().strftime('%d/%m/%Y')}")
+        p.drawString(5, altura - 100, f"Hora: {datetime.now().strftime('%H:%M:%S')}")
+        p.drawString(5, altura - 120, "------------------------------")
+
+        # Cabeçalho da Tabela
+        p.drawString(5, altura - 130, "Item        Qtde  Unit   Total")
+        p.drawString(5, altura - 140, "------------------------------")
+
+        y = altura - 150
+        total = 0
+
+        # Itens
+        for item in mesa.itens:
+            nome = item['nome_produto'][:10].ljust(10)  # Ajustar o nome para 10 caracteres
+            quantidade = str(item['quantidade']).rjust(4)
+            preco_unitario = item['preco_unitario']
+            preco_total = item['quantidade'] * item['preco_unitario']
+            total += item['quantidade'] * item['preco_unitario']
+            preco_unitario_str = f"{preco_unitario:,.2f}".replace('.', ',').rjust(6)
+            preco_total_str = f"{preco_total:,.2f}".replace('.', ',').rjust(7)
+
+            p.drawString(5, y, f"{nome} {quantidade} {preco_unitario_str} {preco_total_str}")
+            y -= 10
+
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+
+        # Subtotal e Total
+        p.drawString(5, y, f"Subtotal:           R$ {total:.2f}".replace('.', ','))
+        y -= 10
+
+        desconto = 5.00  # Exemplo
+        p.drawString(5, y, f"Desconto:           R$ {desconto:.2f}".replace('.', ','))
+        y -= 10
+
+        total_final = total - desconto
+        p.drawString(5, y, f"Total:              R$ {total_final:.2f}".replace('.', ','))
+        y -= 10
+
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+
+        # Forma de Pagamento
+        p.drawString(5, y, "Forma de Pagamento: Dinheiro")
+        y -= 20
+
+        # Agradecimento
+        p.drawCentredString(largura / 2, y, "Obrigado pela preferência!")
+        p.showPage()
+        p.save()
+
+        return response
+O ChatGPT disse:
+
+Parece que os nomes dos produtos estão sendo cortados para caber em um espaço limitado de 10 caracteres, conforme o código abaixo:
+
+python
+Copiar código
+nome = item['nome_produto'][:10].ljust(10)  # Ajustar o nome para 10 caracteres
+Essa linha corta o nome do produto para os primeiros 10 caracteres e alinha o texto à esquerda. Se o nome do produto tiver mais de 10 caracteres, ele será truncado, resultando em nomes incompletos.
+
+Solução: Ajustar o Código para Não Cortar os Nomes
+Aqui está como você pode ajustar o código para lidar com nomes de produtos mais longos, quebrando-os em várias linhas, se necessário:
+
+Quebrando o Nome do Produto em Linhas:
+python
+Copiar código
+class GerarComandaPDFView(View):
+    def get(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, pk=mesa_id)
+        empresa = get_empresa_padrao()
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="comanda_{mesa_id}.pdf"'
+
+        p = canvas.Canvas(response)
+
+        largura = 80 * mm
+        altura = 297 * mm  # Tamanho A4 para o exemplo, ajustar conforme a necessidade
+
+        # Fonte monoespaçada
+        p.setFont("Courier", 10)
+
+        # Cabeçalho
+        p.drawString(5, altura - 20, "------------------------------")
+        p.drawString(5, altura - 30, empresa.nome)
+        p.drawString(5, altura - 40, empresa.endereco)
+        p.drawString(5, altura - 50, f"CNPJ: {empresa.cnpj}")
+        p.drawString(5, altura - 60, f"Telefone: {empresa.telefone}")
+        p.drawString(5, altura - 70, "------------------------------")
+        
+        # Data e Hora
+        p.drawString(5, altura - 90, f"Data: {datetime.now().strftime('%d/%m/%Y')}")
+        p.drawString(5, altura - 100, f"Hora: {datetime.now().strftime('%H:%M:%S')}")
+        p.drawString(5, altura - 120, "------------------------------")
+
+        # Cabeçalho da Tabela
+        p.drawString(5, altura - 130, "Item        Qtde  Unit   Total")
+        p.drawString(5, altura - 140, "------------------------------")
+
+        y = altura - 150
+        total = 0
+
+        # Itens
+        for item in mesa.itens:
+            nome = item['nome_produto']
+            quantidade = str(item['quantidade']).rjust(4)
+            preco_unitario = item['preco_unitario']
+            preco_total = item['quantidade'] * item['preco_unitario']
+            total += preco_total
+            preco_unitario_str = f"{preco_unitario:,.2f}".replace('.', ',').rjust(6)
+            preco_total_str = f"{preco_total:,.2f}".replace('.', ',').rjust(7)
+
+            # Quebra o nome em múltiplas linhas se necessário
+            linhas_nome = [nome[i:i+10] for i in range(0, len(nome), 10)]
+
+            for linha in linhas_nome:
+                p.drawString(5, y, f"{linha.ljust(10)} {quantidade} {preco_unitario_str} {preco_total_str}")
+                y -= 10
+                # Só mostra a quantidade, valor unitário e total na primeira linha
+                quantidade = ""
+                preco_unitario_str = ""
+                preco_total_str = ""
+
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+
+        # Subtotal e Total
+        p.drawString(5, y, f"Subtotal:           R$ {total:.2f}".replace('.', ','))
+        y -= 10
+
+        desconto = 5.00  # Exemplo
+        p.drawString(5, y, f"Desconto:           R$ {desconto:.2f}".replace('.', ','))
+        y -= 10
+
+        total_final = total - desconto
+        p.drawString(5, y, f"Total:              R$ {total_final:.2f}".replace('.', ','))
+        y -= 10
+
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+
+        # Forma de Pagamento
+        p.drawString(5, y, "Forma de Pagamento: Dinheiro")
+        y -= 20
+
+        # Agradecimento
+        p.drawCentredString(largura / 2, y, "Obrigado pela preferência!")
+        p.showPage()
+        p.save()
+
+        return response
+Explicação:
+Quebra de Linhas:
+
+O nome do produto é quebrado em segmentos de 10 caracteres usando uma lista de compreensão: linhas_nome = [nome[i:i+10] for i in range(0, len(nome), 10)].
+Desenho do Texto:
+
+Cada linha do nome é desenhada separadamente. Apenas na primeira linha são mostrados os valores de quantidade, preço unitário e total, as demais linhas exibem apenas o nome, o que impede o corte.
+Resultados Esperados:
+Impressão Completa: O nome completo do produto será mostrado na comanda, quebrando em várias linhas, se necessário.
+Alinhamento Correto: O formato permanecerá tabular, pois os valores de quantidade e preços estarão alinhados à direita.
+Esta abordagem garante que os nomes completos dos produtos sejam exibidos sem cortes, proporcionando um layout mais legível para a comanda na impressão térmica.

@@ -1,0 +1,82 @@
+<!-- produto/templates/produto/list_categoria.html -->
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-md-auto">
+            <button class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#categoriaModal">
+                Cadastrar Categoria
+            </button>
+        </div>
+        <div class="col-md-6 text-end">
+            <input type="text"  
+                hx-post="{% url 'produto:search-categoria' %}"
+                hx-target="#list-categoria"
+                hx-trigger="input changed, search"
+                name="search"
+                class="form-control"
+                placeholder="Pesquisar categorias..."/>
+        </div>
+    </div>
+    <!-- Div que exibe as categorias cadastradas -->
+    <div id="list-categoria">
+        {% include 'produto/partials/htmx_componentes/list_all_categoria.html' %}
+    </div>
+</div>
+
+<!-- Modal para adicionar categoria -->
+<div class="modal fade" id="categoriaModal" tabindex="-1" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoriaModalLabel">Adicionar Nova Categoria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form hx-post="{% url 'produto:criar_categoria_modal' %}"
+                    hx-trigger="submit"
+                    hx-target="#list-categoria"
+                    hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <label for="nome-categoria">Nome da Categoria</label>
+                    <input type="text" id="nome-categoria" name="nome" class="form-control" value="{{ form.instance.nome }}"
+                        hx-get="{% url 'produto:check_categoria' %}"
+                        hx-trigger="keyup"
+                        hx-target="#categoria-out">
+                    <div id="categoria-out"></div>
+                    <br>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Categoria -->
+<div class="modal fade" id="editCategoriaModal" tabindex="-1" aria-labelledby="editCategoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoriaModalLabel">Editar Categoria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoriaForm" hx-post="{% url 'produto:update_categoria' %}" 
+                    hx-trigger="submit" 
+                    hx-target="#list-categoria" 
+                    hx-swap="innerHTML"
+                >
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Nome da Categoria</span>
+                        <input type="text" id="edit-nome-categoria" name="nome" class="form-control" value="{{ form.instance.nome }}">
+                    </div>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

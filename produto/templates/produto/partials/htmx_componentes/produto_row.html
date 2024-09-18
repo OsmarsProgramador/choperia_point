@@ -1,0 +1,23 @@
+<!-- produto/partials/htmx_componentes/produto_row.html -->
+<tr id="produto-{{ produto.id }}">
+    <td>{{ produto.nome_produto }}</td> 
+    <td class="text-end">{{ produto.venda }}</td>
+    <td>{{ produto.codigo }}</td>
+    <td class="text-end">{{ produto.estoque }}</td>
+    <td class="text-end">
+        <button class="btn btn-warning" style="cursor: pointer;"
+            data-bs-toggle="modal" data-bs-target="#editProdutoModal"
+            hx-get="{% url 'produto:edit_produto' produto.id %}" 
+            hx-target="#editProdutoForm">
+            <i class="fa fa-edit"></i>
+        </button>
+        <button class="btn btn-danger" style="cursor: pointer;"
+            hx-delete="{% url 'produto:delete_produto' produto.id %}"
+            hx-trigger="click"
+            hx-target="#list-produto">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>
+
+

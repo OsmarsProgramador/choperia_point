@@ -1,0 +1,211 @@
+Explicação:
+Quebra de Linhas:
+
+O nome do produto é quebrado em segmentos de 10 caracteres usando uma lista de compreensão: linhas_nome = [nome[i:i+10] for i in range(0, len(nome), 10)].
+Desenho do Texto:
+
+Cada linha do nome é desenhada separadamente. Apenas na primeira linha são mostrados os valores de quantidade, preço unitário e total, as demais linhas exibem apenas o nome, o que impede o corte.
+Resultados Esperados:
+Impressão Completa: O nome completo do produto será mostrado na comanda, quebrando em várias linhas, se necessário.
+Alinhamento Correto: O formato permanecerá tabular, pois os valores de quantidade e preços estarão alinhados à direita.
+Esta abordagem garante que os nomes completos dos produtos sejam exibidos sem cortes, proporcionando um layout mais legível para a comanda na impressão térmica.
+
+Você disse:
+Muito bom! Como seria enviar os dados para a impressora de cozinha ou alguma impressora de preparo que enviasse as informações de preparo ou descrição?
+O ChatGPT disse:
+
+Para enviar os dados para uma impressora de cozinha ou qualquer outra impressora de preparo, você precisará seguir algumas etapas específicas que dependem do tipo de impressora e do protocolo de comunicação que ela suporta. A seguir está um guia geral para fazer isso em um ambiente Django, que pode ser adaptado para diferentes tipos de impressoras.
+
+1. Escolher o Método de Envio
+Via Rede (TCP/IP): Muitas impressoras de cozinha suportam a comunicação via rede (usando TCP/IP). Neste caso, você enviaria os dados diretamente para o IP e a porta configurados na impressora.
+Via Porta Serial ou USB: Algumas impressoras podem estar conectadas via porta serial ou USB. Você pode usar bibliotecas específicas para enviar os dados diretamente para a porta de comunicação.
+2. Formatar os Dados para a Impressora
+As impressoras de cozinha frequentemente usam comandos ESC/POS para formatar os dados. Isso inclui comandos para negrito, sublinhado, alinhamento, corte de papel, etc.
+3. Exemplo de Envio Usando TCP/IP
+Aqui está um exemplo de como você poderia enviar um pedido formatado para uma impressora de cozinha via rede usando Python e Django.
+Instale a Biblioteca Necessária
+bash
+Copiar código
+pip install escpos
+Código de Exemplo
+python
+Copiar código
+from escpos.printer import Network
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from .models import Mesa
+from datetime import datetime
+
+class EnviarParaCozinhaView(View):
+    def get(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, pk=mesa_id)
+        
+        try:
+            # Conecte-se à impressora via IP
+            impressora = Network("192.168.0.100")  # IP da impressora de cozinha
+            
+            # Cabeçalho do Pedido
+            impressora.set(align='center', bold=True)
+            impressora.text("Pedido de Cozinha\n")
+            impressora.text(f"Mesa: {mesa.nome}\n")
+            impressora.text(f"Data: {datetime.now().strftime('%d/%m/%Y')}\n")
+            impressora.text(f"Hora: {datetime.now().strftime('%H:%M:%S')}\n")
+            impressora.text("-----------------------------\n")
+            
+            # Itens do Pedido
+            impressora.set(align='left', bold=False)
+            for item in mesa.itens:
+                impressora.text(f"{item['nome_produto']}\n")
+                impressora.text(f"Quantidade: {item['quantidade']}\n")
+                if 'descricao' in item:
+                    impressora.text(f"Descrição: {item['descricao']}\n")
+                impressora.text("-----------------------------\n")
+
+            # Finalizar o Pedido
+            impressora.set(align='center', bold=True)
+            impressora.text("----- FIM DO PEDIDO -----\n")
+            impressora.cut()  # Comando para cortar o papel
+            
+            impressora.close()
+            return HttpResponse("Pedido enviado para a cozinha com sucesso!")
+        
+        except Exception as e:
+            return HttpResponse(f"Erro ao enviar para a cozinha: {str(e)}", status=500)
+4. Adaptar para Outros Protocolos
+Se você estiver usando uma conexão serial ou USB, você precisará usar a biblioteca pyserial ou uma biblioteca específica para lidar com dispositivos USB.
+Exemplo com pyserial:
+
+python
+Copiar código
+import serial
+
+ser = serial.Serial('/dev/ttyUSB0', 9600)  # Ajuste o caminho e a taxa de transmissão conforme necessário
+ser.write(b'Pedido de Cozinha\n')
+ser.write(b'Mesa: 10\n')
+ser.write(b'Produto: Pizza\n')
+ser.write(b'Quantidade: 2\n')
+ser.write(b'----------------------\n')
+ser.close()
+5. Considerações Importantes
+Testar Localmente: Antes de enviar para a impressora real, sempre teste o código em um ambiente de desenvolvimento para garantir que os dados estão formatados corretamente.
+Segurança: Certifique-se de que a comunicação com a impressora seja segura e que o IP e outras configurações sensíveis não estejam expostos desnecessariamente.
+Comandos ESC/POS: Conheça os comandos ESC/POS que sua impressora suporta para personalizar ainda mais a impressão (negrito, corte de papel, etc.).
+6. Integração no Sistema de Pedidos
+Automação: Você pode integrar este processo para que, ao adicionar um pedido a uma mesa, ele seja automaticamente enviado para a impressora de cozinha sem intervenção manual.
+Logs e Monitoramento: Considere implementar logs para monitorar se os pedidos foram enviados com sucesso para a impressora.
+Este fluxo permite que os dados sejam enviados de forma eficiente para uma impressora de cozinha, formatados conforme necessário, e gerenciados diretamente do seu sistema Django.
+
+
+****************************************************************************************************************************************************
+
+Para enviar o pedido para a cozinha simultaneamente ao gerar a comanda do caixa (GerarComandaPDFView), você pode fazer uma chamada adicional para EnviarParaCozinhaView diretamente dentro do GerarComandaPDFView.
+
+Aqui está como você pode modificar o GerarComandaPDFView para incluir essa funcionalidade:
+
+Modificando GerarComandaPDFView para Enviar Simultaneamente à Cozinha:
+python
+Copiar código
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from reportlab.pdfgen import canvas
+from .models import Mesa
+from .views import EnviarParaCozinhaView
+
+class GerarComandaPDFView(View):
+    def get(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, pk=mesa_id)
+        empresa = get_empresa_padrao()
+
+        # Criação do PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="comanda_{mesa_id}.pdf"'
+
+        p = canvas.Canvas(response)
+
+        largura = 80 * mm
+        altura = 297 * mm  # Tamanho A4 para o exemplo, ajustar conforme a necessidade
+
+        # Cabeçalho
+        p.setFont("Courier", 10)
+        p.drawString(5, altura - 20, "------------------------------")
+        p.drawString(5, altura - 30, empresa.nome)
+        p.drawString(5, altura - 40, empresa.endereco)
+        p.drawString(5, altura - 50, f"CNPJ: {empresa.cnpj}")
+        p.drawString(5, altura - 60, f"Telefone: {empresa.telefone}")
+        p.drawString(5, altura - 70, "------------------------------")
+        p.drawString(5, altura - 80, f"Data: {datetime.now().strftime('%d/%m/%Y')}")
+        p.drawString(5, altura - 90, f"Hora: {datetime.now().strftime('%H:%M:%S')}")
+        p.drawString(5, altura - 100, "------------------------------")
+        p.drawString(5, altura - 110, "Item        Qtde  Unit   Total")
+        p.drawString(5, altura - 120, "------------------------------")
+
+        y = altura - 130
+        total = 0
+
+        # Itens da mesa
+        for item in mesa.itens:
+            nome = item['nome_produto'][:10].ljust(10)
+            quantidade = str(item['quantidade']).rjust(4)
+            preco_unitario = item['preco_unitario']
+            preco_total = item['quantidade'] * preco_unitario
+            total += preco_total
+            preco_unitario_str = f"{preco_unitario:,.2f}".replace('.', ',').rjust(6)
+            preco_total_str = f"{preco_total:,.2f}".replace('.', ',').rjust(7)
+
+            p.drawString(5, y, f"{nome} {quantidade} {preco_unitario_str} {preco_total_str}")
+            y -= 10
+
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+
+        # Total e descontos
+        p.drawString(5, y, f"Subtotal:           R$ {total:.2f}".replace('.', ','))
+        y -= 10
+        desconto = 5.00  # Exemplo
+        p.drawString(5, y, f"Desconto:           R$ {desconto:.2f}".replace('.', ','))
+        y -= 10
+        total_final = total - desconto
+        p.drawString(5, y, f"Total:              R$ {total_final:.2f}".replace('.', ','))
+        y -= 10
+        p.drawString(5, y, "------------------------------")
+        y -= 10
+        p.drawString(5, y, "Forma de Pagamento: Dinheiro")
+        y -= 20
+        p.drawCentredString(largura / 2, y, "Obrigado pela preferência!")
+        p.showPage()
+        p.save()
+
+        # Chamada adicional para enviar a comanda para a cozinha
+        self.enviar_para_cozinha(request, mesa)
+
+        return response
+
+    def enviar_para_cozinha(self, request, mesa):
+        """
+        Função interna que faz a chamada para EnviarParaCozinhaView.
+        """
+        itens_calculados = [
+            {
+                'nome_produto': item['nome_produto'],
+                'quantidade': item['quantidade'],
+                'descricao': item.get('descricao', 'N/A')
+            }
+            for item in mesa.itens
+        ]
+
+        # Renderizar e enviar para a cozinha
+        # Isso seria um render sem retorno, só para gerar a lógica de envio para a cozinha.
+        # Dependendo da implementação de EnviarParaCozinhaView, isso pode ser simplificado ou adaptado
+        return render(request, 'mesa/partials/htmx_componentes/item_list_cozinha.html', {
+            'itens_calculados': itens_calculados,
+            'mesa': mesa
+        })
+Como Funciona:
+Criação do PDF: O PDF é gerado como de costume, contendo os itens da comanda, os totais e informações da empresa.
+Envio à Cozinha: A nova função enviar_para_cozinha é chamada dentro da view de geração do PDF. Ela utiliza a mesma lógica que seria usada na EnviarParaCozinhaView para enviar as informações de preparo dos itens para a cozinha.
+Renderização para Cozinha: A função enviar_para_cozinha chama o template específico para a cozinha, que é renderizado e enviado para a impressora da cozinha (ou processado conforme a necessidade).
+Considerações Importantes:
+Desempenho: Fazer ambas as operações (gerar PDF e enviar à cozinha) em uma única chamada pode aumentar o tempo de resposta, dependendo da complexidade do processamento.
+Erro de Conexão: Se houver algum problema ao enviar para a cozinha, o sistema deve ser capaz de lidar com falhas sem impedir a geração do PDF.
+Personalização: A função enviar_para_cozinha pode ser adaptada para enviar os dados via rede a uma impressora de cozinha, se necessário.
+Dessa forma, ao gerar a comanda para o caixa, o pedido é automaticamente enviado para a cozinha, garantindo que a preparação dos itens comece imediatamente.

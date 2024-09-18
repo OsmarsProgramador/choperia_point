@@ -1,0 +1,57 @@
+Saída para Impressora Térmica Não Fiscal: Um Exemplo Prático
+A saída para uma impressora térmica não fiscal, geralmente um cupom, é formatada para fornecer informações claras e concisas sobre uma transação. Essa formatação pode variar ligeiramente entre diferentes sistemas de PDV e impressoras, mas os elementos básicos são os mesmos.
+
+Exemplo de um cupom:
+
+--------------------------------
+[Nome da Loja]
+[Endereço]
+[Telefone]
+[CNPJ]
+--------------------------------
+Data: 15/03/2024
+Hora: 15:30
+--------------------------------
+Item        Qtde  Valor Unit.  Valor Total
+--------------------------------
+Produto A     2     R$ 10,00    R$ 20,00
+Produto B     1     R$ 15,00    R$ 15,00
+--------------------------------
+Subtotal:        R$ 35,00
+Desconto:        R$  5,00
+--------------------------------
+Total:           R$ 30,00
+--------------------------------
+Forma de Pagamento: Dinheiro
+--------------------------------
+Obrigado pela preferência!
+--------------------------------
+Elementos comuns em um cupom:
+
+Informações da loja: Nome, endereço, telefone e CNPJ.
+Data e hora da compra: Indicam quando a transação ocorreu.
+Itens comprados: Descrição do produto, quantidade e valor unitário.
+Valores: Subtotal, descontos (se houver), valor total e forma de pagamento.
+Informações adicionais: Pode incluir o número do pedido, dados do cliente (se cadastrado) e outras informações relevantes.
+Características da impressão:
+
+Fonte: Geralmente uma fonte monoespaçada de tamanho pequeno para otimizar o espaço.
+Alinhamento: O texto é alinhado à esquerda ou ao centro, dependendo da configuração da impressora.
+Negrito e sublinhado: Podem ser usados para destacar informações importantes, como o valor total.
+Código de barras: Pode ser impresso para facilitar a identificação do cupom e a leitura em sistemas de gestão.
+Personalização:
+
+A formatação do cupom pode ser personalizada de acordo com as necessidades da empresa. É possível adicionar logotipos, mensagens promocionais, informações sobre trocas e devoluções, entre outros elementos.
+
+Considerações importantes:
+
+Tamanho do papel: A maioria das impressoras térmicas utiliza papel de 80mm de largura.
+Densidade da impressão: A densidade da impressão pode ser ajustada para economizar papel e tinta.
+Velocidade de impressão: A velocidade de impressão é importante para agilizar o atendimento aos clientes.
+Softwares de PDV:
+
+A geração do cupom é realizada por um software de PDV, que se comunica com a impressora térmica. Esses softwares oferecem diversas opções de personalização e formatação dos cupons.
+
+Em resumo:
+
+A saída para uma impressora térmica não fiscal é um documento simples e direto, que contém todas as informações necessárias sobre uma transação. A personalização do cupom permite que cada empresa crie uma identidade visual e ofereça uma melhor experiência ao cliente.

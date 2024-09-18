@@ -1,0 +1,136 @@
+<!-- produto/templates/produto/partials/htmx_componentes/list_all_produtos.html -->
+{% if produtos %}
+
+    <table id="tabela-listar" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Preço</th>
+                <th scope="col">Código</th>
+                <th scope="col">Estoque</th>
+                <th scope="col" class="text-end">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+                <tr id="produto-{{ produto.id }}">
+                    <td class="align-middle">{{ produto.nome_produto }}</td>
+                    <td class="align-middle">{{ produto.venda }}</td>
+                    <td class="align-middle">{{ produto.codigo }}</td>
+                    <td class="align-middle">{{ produto.estoque }}</td>
+                    <td class="text-end align-middle">
+                        <button class="btn btn-warning" style="cursor: pointer;"
+                            data-bs-toggle="modal" data-bs-target="#editProdutoModal"
+                            hx-get="{% url 'produto:edit_produto' produto.id %}" 
+                            hx-target="#editProdutoForm">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger" style="cursor: pointer;"
+                            hx-delete="{% url 'produto:delete_produto' produto.id %}"
+                            hx-trigger="click"
+                            hx-target="#list-produto">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+               
+        <!--
+        <tfoot>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Preço</th>
+                <th scope="col">Código</th>
+                <th scope="col">Estoque</th>
+                <th scope="col" class="text-end">Ações</th>
+            </tr>
+        </tfoot>
+        -->
+    </table>
+
+    <!-- Controles de Paginação -->
+    <!-- 
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <nav aria-label="Navegação de página">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">&laquo; primeira</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">próxima</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    -->
+    {% block scripts %}
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.3/datatables.min.js"></script>
+        
+    <!-- DataTables Buttons JS -->
+    <script src="https://cdn.datatables.net/buttons/2.1.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.1/js/buttons.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#tabela-listar').DataTable({
+                responsive: true,
+                paging: true,
+                aaSorting: [],
+                pageLength: 10,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    search: "Procurar:",
+                    info: "Mostrando _START_ até _END_ de _TOTAL_ registros",
+                    infoFiltered: "(filtrados de um total de _MAX_ registros)",
+                    paginate: {
+                        first: "Primeiro",
+                        last: "Último",
+                        next: "Seguinte",
+                        previous: "Anterior"
+                    },
+                    emptyTable: "Sem dados disponíveis",
+                    zeroRecords: "Nenhum resultado encontrado"
+                },
+                // Configuração para alinhamento correto
+                dom: '<"row align-items-center"<"col-md-4"l><"col-md-4 text-center"B><"col-md-4"f>>' +
+                    '<"row"<"col-sm-12"tr>>' +
+                    '<"row align-items-center"<"col-md-6"i><"col-md-6 d-flex justify-content-end"p>>',
+                buttons: [
+                    {
+                        text: 'Cadastrar Produto',
+                        className: 'btn btn-primary',
+                        action: function (e, dt, node, config) {
+                            $('#produtoModal').modal('show');
+                        }
+                    }
+                ]
+            });
+        });
+
+    </script>
+
+
+    {% endblock %}
+
+{% else %}
+    <h4>Nenhum produto cadastrado.</h4>
+{% endif %}
+
+
+

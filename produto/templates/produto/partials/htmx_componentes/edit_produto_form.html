@@ -1,0 +1,64 @@
+<!-- produto/templates/produto/partials/htmx_componentes/edit_produto_form.html -->
+{% load custom_filters %}
+    <form id="editProdutoForm" 
+        hx-post="{% url 'produto:update_produto' %}" 
+        hx-trigger="submit" 
+        hx-target="#produto-{{ produto.id }}" 
+        hx-swap="outerHTML"
+        enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="produto_id" value="{{ produto.id }}">
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Nome do produto</span>
+        <input type="text" id="nome-produto" name="nome_produto" class="form-control" value="{{ form.nome_produto.value }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="categoria-produto">Categoria</label>
+        <select id="categoria-produto" name="categoria" class="form-select">
+            {% for categoria in categorias %}
+                <option value="{{ categoria.id }}" {% if form.categoria.value == categoria.id|stringformat:"s" %}selected{% endif %}>{{ categoria.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text">Descrição</span>
+        <textarea id="descricao-produto" name="descricao" class="form-control">{{ form.descricao.value }}</textarea>
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Custo</span>
+        <input type="number" id="custo-produto" name="custo" class="form-control" value="{{ produto.custo|stringformat:"f"|floatformat:2|replace_comma }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Preço de Venda</span>
+        <input type="number" id="venda-produto" name="venda" class="form-control" step="0.01" value="{{ form.venda.value|stringformat:"f"|floatformat:2|replace_comma }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Código</span>
+        <input type="text" id="codigo-produto" name="codigo" class="form-control" value="{{ form.codigo.value }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Estoque</span>
+        <input type="number" id="estoque-produto" name="estoque" class="form-control" value="{{ form.estoque.value }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Estoque Total</span>
+        <input type="number" id="estoque-total-produto" name="estoque_total" class="form-control" value="{{ form.estoque_total.value }}">
+    </div>
+    
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="imagem-produto">Imagem</label>
+        <input type="file" id="imagem-produto" name="imagem" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-success">Salvar</button>
+</form>
+
+
+
