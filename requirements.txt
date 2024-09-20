@@ -1,12 +1,10 @@
-
-
 appdirs==1.4.4
 argcomplete==3.5.0
 asgiref==3.8.1
 chardet==5.2.0
 colorama==0.4.6
-Django==4.2.16  # Substituí a versão 5.1.1
-escpos==1.9     # Ajustei para uma versão existente
+Django==5.1.1
+escpos==2.0.0
 et-xmlfile==1.1.0
 Faker==28.4.1
 future==1.0.0
@@ -30,6 +28,3 @@ typing_extensions==4.12.2
 tzdata==2024.1
 validate-docbr==1.10.0
 viivakoodi==0.8.0
-
-
-
