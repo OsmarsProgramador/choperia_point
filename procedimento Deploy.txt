@@ -1,0 +1,277 @@
+03:58 ~ $ pip3.10 install --user pythonanywhere
+Looking in links: /usr/share/pip-wheels
+Collecting pythonanywhere
+  Downloading pythonanywhere-0.14.1.tar.gz (51 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.6/51.6 kB 556.8 kB/s eta 0:00:00
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: docopt in /usr/local/lib/python3.10/site-packages (from pythonanywhere) (0.6.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.10/site-packages (from pythonanywhere) (21.3)
+Requirement already satisfied: python-dateutil in /usr/local/lib/python3.10/site-packages (from pythonanywhere) (2.8.2)
+Collecting pythonanywhere_core
+  Downloading pythonanywhere_core-0.1.10-py3-none-any.whl (11 kB)
+Requirement already satisfied: requests in /usr/local/lib/python3.10/site-packages (from pythonanywhere) (2.28.1)
+Collecting schema
+  Downloading schema-0.7.7-py2.py3-none-any.whl (18 kB)
+Collecting snakesay
+  Downloading snakesay-0.10.2-py3-none-any.whl (3.2 kB)
+Collecting tabulate
+  Downloading tabulate-0.9.0-py3-none-any.whl (35 kB)
+Collecting typer
+  Downloading typer-0.12.5-py3-none-any.whl (47 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.3/47.3 kB 904.7 kB/s eta 0:00:00
+Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /usr/local/lib/python3.10/site-packages (from packaging->pythonanywhere) (2.4.7)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/site-packages (from python-dateutil->pythonanywhere) (1.16.0)
+Collecting requests
+  Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.9/64.9 kB 1.3 MB/s eta 0:00:00
+Collecting typing_extensions<5.0.0,>=4.5.0
+  Downloading typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/site-packages (from requests->pythonanywhere) (3.3)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/site-packages (from requests->pythonanywhere) (2022.6.15)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/site-packages (from requests->pythonanywhere) (2.1.0)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/site-packages (from requests->pythonanywhere) (1.26.9)
+Requirement already satisfied: click>=8.0.0 in /usr/local/lib/python3.10/site-packages (from typer->pythonanywhere) (8.0.3)
+Requirement already satisfied: rich>=10.11.0 in /usr/local/lib/python3.10/site-packages (from typer->pythonanywhere) (11.2.0)
+Collecting shellingham>=1.3.0
+  Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Requirement already satisfied: pygments<3.0.0,>=2.6.0 in /usr/local/lib/python3.10/site-packages (from rich>=10.11.0->typer->pythonanywhere) (2.12.0)
+Requirement already satisfied: commonmark<0.10.0,>=0.9.0 in /usr/local/lib/python3.10/site-packages (from rich>=10.11.0->typer->pythonanywhere) (0.9.1)
+Requirement already satisfied: colorama<0.5.0,>=0.4.0 in /usr/local/lib/python3.10/site-packages (from rich>=10.11.0->typer->pythonanywhere) (0.4.4)
+Building wheels for collected packages: pythonanywhere
+  Building wheel for pythonanywhere (setup.py) ... done
+  Created wheel for pythonanywhere: filename=pythonanywhere-0.14.1-py3-none-any.whl size=40200 sha256=20e76b3e85f7f019b9b75e317d01833726805d00007fe0b14e98ce7b2c96a941
+  Stored in directory: /home/osmarnegao89ph/.cache/pip/wheels/9e/8e/7f/683ed97c3c00d7b137a58d4607879dbd8081d176df5cec2c55
+Successfully built pythonanywhere
+Installing collected packages: schema, typing_extensions, tabulate, snakesay, shellingham, requests, typer, pythonanywhere_core, pythonanywhere
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+arviz 0.11.4 requires typing-extensions<4,>=3.7.4.3, but you have typing-extensions 4.12.2 which is incompatible.
+Successfully installed pythonanywhere-0.14.1 pythonanywhere_core-0.1.10 requests-2.32.3 schema-0.7.7 shellingham-1.5.4 snakesay-0.10.2 tabulate-0.9.0 typer-0.12.5 typing_extensions-4.12.2
+03:58 ~ $ pa_autoconfigure_django.py --python=3.10 
+Usage:
+  pa_autoconfigure_django.py <git-repo-url> [--branch=<branch> --domain=<domain> --python=<python-version>] [--nuke]
+03:59 ~ $ pa_autoconfigure_django.py --python=3.10 https://github.com/OsmarsProgramador/choperia_point
+
+< Running API sanity checks >
+   \
+    ~<:>>>>>>>>>
+Cloning into '/home/osmarnegao89ph/osmarnegao89ph.pythonanywhere.com'...
+remote: Enumerating objects: 386, done.
+remote: Counting objects: 100% (386/386), done.
+remote: Compressing objects: 100% (333/333), done.
+remote: Total 386 (delta 117), reused 81 (delta 36), pack-reused 0 (from 0)
+Receiving objects: 100% (386/386), 3.65 MiB | 13.75 MiB/s, done.
+Resolving deltas: 100% (117/117), done.
+Updating files: 100% (241/241), done.
+
+< Creating virtualenv with Python3.10 >
+   \
+    ~<:>>>>>>>>>
+created virtual environment CPython3.10.5.final.0-64 in 24851ms
+  creator CPython3Posix(dest=/home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/osmarnegao89ph/.local/share/virtualenv)
+    added seed packages: pip==22.1.2, setuptools==62.6.0, wheel==0.37.1
+  activators BashActivator,CShellActivator,FishActivator,NushellActivator,PowerShellActivator,PythonActivator
+virtualenvwrapper.user_scripts creating /home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com/bin/predeactivate
+virtualenvwrapper.user_scripts creating /home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com/bin/preactivate
+virtualenvwrapper.user_scripts creating /home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com/bin/postactivate
+virtualenvwrapper.user_scripts creating /home/osmarnegao89ph/.virtualenvs/osmarnegao89ph.pythonanywhere.com/bin/get_env_details
+
+  ______________________________________________________________________
+/                                                                        \
+| Pip installing -r /home/osmarnegao89ph/osmarnegao89ph.pythonanywhere.c |
+| om/requirements.txt (this may take a couple of minutes)                |
+\                                                                        /
+  ----------------------------------------------------------------------
+   \
+    ~<:>>>>>>>>>
+Looking in links: /usr/share/pip-wheels
+Collecting appdirs==1.4.4
+  Downloading appdirs-1.4.4-py2.py3-none-any.whl (9.6 kB)
+Collecting argcomplete==3.5.0
+  Downloading argcomplete-3.5.0-py3-none-any.whl (43 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.5/43.5 kB 841.5 kB/s eta 0:00:00
+Collecting asgiref==3.8.1
+  Downloading asgiref-3.8.1-py3-none-any.whl (23 kB)
+Collecting chardet==5.2.0
+  Downloading chardet-5.2.0-py3-none-any.whl (199 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 199.4/199.4 kB 2.9 MB/s eta 0:00:00
+Collecting colorama==0.4.6
+  Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Collecting Django==4.2.16
+  Downloading Django-4.2.16-py3-none-any.whl (8.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.0/8.0 MB 37.0 MB/s eta 0:00:00
+Collecting escpos==1.9
+  Downloading escpos-1.9.tar.gz (208 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 208.4/208.4 kB 2.8 MB/s eta 0:00:00
+  Preparing metadata (setup.py) ... done
+Collecting et-xmlfile==1.1.0
+  Downloading et_xmlfile-1.1.0-py3-none-any.whl (4.7 kB)
+Collecting Faker==28.4.1
+  Downloading Faker-28.4.1-py3-none-any.whl (1.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 16.6 MB/s eta 0:00:00
+Collecting future==1.0.0
+  Downloading future-1.0.0-py3-none-any.whl (491 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 491.3/491.3 kB 5.8 MB/s eta 0:00:00
+Collecting numpy==2.1.1
+  Downloading numpy-2.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.3/16.3 MB 20.3 MB/s eta 0:00:00
+Collecting openpyxl==3.1.5
+  Downloading openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 250.9/250.9 kB 5.4 MB/s eta 0:00:00
+Collecting pandas==2.2.2
+  Downloading pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 32.0 MB/s eta 0:00:00
+Collecting pillow==10.4.0
+  Downloading pillow-10.4.0-cp310-cp310-manylinux_2_28_x86_64.whl (4.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 43.4 MB/s eta 0:00:00
+Collecting pypng==0.20220715.0
+  Downloading pypng-0.20220715.0-py3-none-any.whl (58 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 58.1/58.1 kB 1.7 MB/s eta 0:00:00
+Collecting pyserial==3.5
+  Downloading pyserial-3.5-py2.py3-none-any.whl (90 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.6/90.6 kB 2.3 MB/s eta 0:00:00
+Collecting python-barcode==0.15.1
+  Downloading python_barcode-0.15.1-py3-none-any.whl (212 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 213.0/213.0 kB 5.7 MB/s eta 0:00:00
+Collecting python-dateutil==2.9.0.post0
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 229.9/229.9 kB 4.4 MB/s eta 0:00:00
+Collecting pytz==2024.2
+  Downloading pytz-2024.2-py2.py3-none-any.whl (508 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 508.0/508.0 kB 10.8 MB/s eta 0:00:00
+Collecting pyusb==1.2.1
+  Downloading pyusb-1.2.1-py3-none-any.whl (58 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 58.4/58.4 kB 344.8 kB/s eta 0:00:00
+Collecting PyYAML==6.0.2
+  Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (751 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 751.2/751.2 kB 17.4 MB/s eta 0:00:00
+Collecting qrcode==7.4.2
+  Downloading qrcode-7.4.2-py3-none-any.whl (46 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 kB 1.2 MB/s eta 0:00:00
+Collecting reportlab==4.2.2
+  Downloading reportlab-4.2.2-py3-none-any.whl (1.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 33.7 MB/s eta 0:00:00
+Collecting setuptools==75.1.0
+  Using cached setuptools-75.1.0-py3-none-any.whl (1.2 MB)
+Collecting six==1.16.0
+  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+Collecting sqlparse==0.5.1
+  Downloading sqlparse-0.5.1-py3-none-any.whl (44 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.2/44.2 kB 813.8 kB/s eta 0:00:00
+Collecting typing_extensions==4.12.2
+  Using cached typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+Collecting tzdata==2024.1
+  Downloading tzdata-2024.1-py2.py3-none-any.whl (345 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 345.4/345.4 kB 6.8 MB/s eta 0:00:00
+Collecting validate-docbr==1.10.0
+  Downloading validate_docbr-1.10.0-py3-none-any.whl (18 kB)
+Collecting viivakoodi==0.8.0
+  Downloading viivakoodi-0.8.0.tar.gz (224 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 224.8/224.8 kB 7.0 MB/s eta 0:00:00
+  Preparing metadata (setup.py) ... done
+Collecting argparse
+  Downloading argparse-1.4.0-py2.py3-none-any.whl (23 kB)
+Building wheels for collected packages: escpos, viivakoodi
+  Building wheel for escpos (setup.py) ... done
+  Created wheel for escpos: filename=escpos-1.9-py3-none-any.whl size=50025 sha256=1c86cc6f252827ef8043a15b092b6506e82da96b4bdea2482e50d7cf02912f91
+  Stored in directory: /home/osmarnegao89ph/.cache/pip/wheels/48/9f/41/9b68eaa9858aa6d8b3bf0563d77c5d4dc98de402a67cb13bc5
+  Building wheel for viivakoodi (setup.py) ... done
+  Created wheel for viivakoodi: filename=viivakoodi-0.8.0-py3-none-any.whl size=208483 sha256=3f753c310c33fef6d355f8215e7dde9d7140581a50d6c20c4a5d43a6ecd896cf
+  Stored in directory: /home/osmarnegao89ph/.cache/pip/wheels/ad/51/9b/f49de8143f972048b731779ae1057a2ba4beb028f4a667e6a3
+Successfully built escpos viivakoodi
+Installing collected packages: viivakoodi, validate-docbr, pytz, python-barcode, pyserial, pypng, argparse, appdirs, tzdata, typing_extensions, sqlparse, six, setuptools, PyYAML, pyusb, pillow, numpy, future, et-xmlfile, colorama, chardet, argcomplete, reportlab, qrcode, python-dateutil, openpyxl, asgiref, pandas, Faker, escpos, Django
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 62.6.0
+    Uninstalling setuptools-62.6.0:
+      Successfully uninstalled setuptools-62.6.0
+Successfully installed Django-4.2.16 Faker-28.4.1 PyYAML-6.0.2 appdirs-1.4.4 argcomplete-3.5.0 argparse-1.4.0 asgiref-3.8.1 chardet-5.2.0 colorama-0.4.6 escpos-1.9 et-xmlfile-1.1.0 future-1.0.0 numpy-2.1.1 openpyxl-3.1.5 pandas-2.2.2 pillow-10.4.0 pypng-0.20220715.0 pyserial-3.5 python-barcode-0.15.1 python-dateutil-2.9.0.post0 pytz-2024.2 pyusb-1.2.1 qrcode-7.4.2 reportlab-4.2.2 setuptools-75.1.0 six-1.16.0 sqlparse-0.5.1 typing_extensions-4.12.2 tzdata-2024.1 validate-docbr-1.10.0 viivakoodi-0.8.0
+
+< Creating web app via API >
+   \
+    ~<:>>>>>>>>>
+
+< Adding static files mappings for /static/ and /media/ >
+   \
+    ~<:>>>>>>>>>
+
+  __________________________________________________
+/                                                    \
+| Updating wsgi file at                              |
+| /var/www/osmarnegao89ph_pythonanywhere_com_wsgi.py |
+\                                                    /
+  --------------------------------------------------
+   \
+    ~<:>>>>>>>>>
+
+< Updating settings.py >
+   \
+    ~<:>>>>>>>>>
+
+< Running collectstatic >
+   \
+    ~<:>>>>>>>>>
+
+129 static files copied to '/home/osmarnegao89ph/osmarnegao89ph.pythonanywhere.com/staticfiles'.
+
+< Running migrate database >
+   \
+    ~<:>>>>>>>>>
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, empresa, estoque, mesa, produto, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying empresa.0001_initial... OK
+  Applying produto.0001_initial... OK
+  Applying estoque.0001_initial... OK
+  Applying mesa.0001_initial... OK
+  Applying sessions.0001_initial... OK
+
+< Reloading osmarnegao89ph.pythonanywhere.com via API >
+   \
+    ~<:>>>>>>>>>
+
+  _________________________________________
+/                                           \
+| All done!  Your site is now live at       |
+| https://osmarnegao89ph.pythonanywhere.com |
+\                                           /
+  -----------------------------------------
+   \
+    ~<:>>>>>>>>>
+
+
+  ___________________________________________________________________
+/                                                                     \
+| Starting Bash shell with activated virtualenv in project directory. |
+| Press Ctrl+D to exit.                                               |
+\                                                                     /
+  -------------------------------------------------------------------
+   \
+    ~<:>>>>>>>>>
+(osmarnegao89ph.pythonanywhere.com) 04:11 ~/osmarnegao89ph.pythonanywhere.com (main)$ python manage.py createsuperuser
+Usuário (leave blank to use 'osmarnegao89ph'): admin
+Endereço de email: 
+Password: 
+Password (again): 
+Esta senha é muito curta. Ela precisa conter pelo menos 8 caracteres.
+Esta senha é muito comum.
+Esta senha é inteiramente numérica.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
