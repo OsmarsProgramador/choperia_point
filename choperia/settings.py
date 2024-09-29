@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-j1yz#s-@2$-tfr3)rk5*el)6hd&-jg!woa(*rae@7weqx6jgg)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '172.30.140.95', 'localhost']
+
 
 
 # Application definition
@@ -133,7 +135,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Diretório para coletar arquivos estáticos
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = '/mnt/d/choperia_point/staticfiles'
 
 # Diretórios adicionais para procurar arquivos estáticos
 STATICFILES_DIRS = [
